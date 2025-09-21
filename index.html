@@ -162,6 +162,12 @@
             margin-top: 10px;
         }
         
+        /* Action buttons in tables */
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
         /* Adjustments for larger screens */
         @media (min-width: 768px) {
             .bottom-navbar {
@@ -297,6 +303,7 @@
                                                 <th>Vendo</th>
                                                 <th>Gross Sales</th>
                                                 <th>Net Income</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody id="recent-transactions">
@@ -500,6 +507,7 @@
                                         <th>Gross Sales</th>
                                         <th>Expenses</th>
                                         <th>Net Income</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody id="report-data">
@@ -511,6 +519,7 @@
                                         <th id="report-total-sales">₱0.00</th>
                                         <th id="report-total-expenses">₱0.00</th>
                                         <th id="report-total-income">₱0.00</th>
+                                        <th></th>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -621,14 +630,15 @@
             currentSection: 'dashboard-section',
             vendos: [],
             transactions: [],
-            users: [
-                { username: 'admin', password: '2020Pagadian', role: 'admin' }
-            ],
+            users: [],
             signatureData: null
         };
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
+            // Load data from localStorage
+            loadFromLocalStorage();
+            
             // Check if user is already logged in
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
@@ -639,9 +649,30 @@
             // Set up event listeners
             document.getElementById('login-form').addEventListener('submit', handleLogin);
             
-            // Load sample data for demonstration
-            loadSampleData();
+            // Add default admin user if no users exist
+            if (appState.users.length === 0) {
+                appState.users.push({ username: 'admin', password: '2020Pagadian', role: 'admin' });
+                saveToLocalStorage();
+            }
         });
+
+        // Load data from localStorage
+        function loadFromLocalStorage() {
+            const vendos = localStorage.getItem('exeWifiVendos');
+            const transactions = localStorage.getItem('exeWifiTransactions');
+            const users = localStorage.getItem('exeWifiUsers');
+            
+            if (vendos) appState.vendos = JSON.parse(vendos);
+            if (transactions) appState.transactions = JSON.parse(transactions);
+            if (users) appState.users = JSON.parse(users);
+        }
+
+        // Save data to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('exeWifiVendos', JSON.stringify(appState.vendos));
+            localStorage.setItem('exeWifiTransactions', JSON.stringify(appState.transactions));
+            localStorage.setItem('exeWifiUsers', JSON.stringify(appState.users));
+        }
 
         // Handle user login
         function handleLogin(e) {
@@ -852,8 +883,8 @@
                 const touch = e.touches[0];
                 const rect = canvas.getBoundingClientRect();
                 const mouseEvent = new MouseEvent('mousedown', {
-                    clientX: touch.clientX,
-                    clientY: touch.clientY
+                    clientX: touch.clientX - rect.left,
+                    clientY: touch.clientY - rect.top
                 });
                 canvas.dispatchEvent(mouseEvent);
             });
@@ -861,9 +892,10 @@
             canvas.addEventListener('touchmove', (e) => {
                 e.preventDefault();
                 const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
                 const mouseEvent = new MouseEvent('mousemove', {
-                    clientX: touch.clientX,
-                    clientY: touch.clientY
+                    clientX: touch.clientX - rect.left,
+                    clientY: touch.clientY - rect.top
                 });
                 canvas.dispatchEvent(mouseEvent);
             });
@@ -889,60 +921,6 @@
             });
         }
 
-        // Load sample data for demonstration
-        function loadSampleData() {
-            // Sample vendos
-            appState.vendos = [
-                { id: 1, name: 'Vendo 1 - Main Street', address: '123 Main Street, Pagadian City' },
-                { id: 2, name: 'Vendo 2 - Market Square', address: 'Market Square, Pagadian City' },
-                { id: 3, name: 'Vendo 3 - Mall Branch', address: 'Gaisano Mall, Pagadian City' }
-            ];
-            
-            // Sample transactions
-            const today = new Date();
-            const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 15);
-            const twoMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 2, 10);
-            
-            appState.transactions = [
-                {
-                    id: 1,
-                    date: today,
-                    vendoId: 1,
-                    grossSales: 12500,
-                    internetPayment: 1500,
-                    electricityUsage: 800,
-                    custodianName: 'Juan Dela Cruz',
-                    signature: null
-                },
-                {
-                    id: 2,
-                    date: lastMonth,
-                    vendoId: 2,
-                    grossSales: 9800,
-                    internetPayment: 1500,
-                    electricityUsage: 750,
-                    custodianName: 'Maria Santos',
-                    signature: null
-                },
-                {
-                    id: 3,
-                    date: twoMonthsAgo,
-                    vendoId: 3,
-                    grossSales: 11200,
-                    internetPayment: 1500,
-                    electricityUsage: 820,
-                    custodianName: 'Pedro Reyes',
-                    signature: null
-                }
-            ];
-            
-            // Sample users (besides the default admin)
-            appState.users.push(
-                { username: 'collector1', password: 'password1', role: 'collector' },
-                { username: 'collector2', password: 'password2', role: 'collector' }
-            );
-        }
-
         // Load vendos into the UI
         function loadVendos() {
             const vendoList = document.getElementById('vendo-list');
@@ -957,7 +935,9 @@
                     <td>${vendo.address}</td>
                     <td>
                         ${appState.currentUser.role === 'admin' ? 
-                        `<button class="btn btn-sm btn-danger" onclick="deleteVendo(${vendo.id})">Delete</button>` : 
+                        `<div class="action-buttons">
+                            <button class="btn btn-sm btn-danger" onclick="deleteVendo(${vendo.id})">Delete</button>
+                         </div>` : 
                         ''}
                     </td>
                 `;
@@ -984,6 +964,7 @@
             };
             
             appState.vendos.push(newVendo);
+            saveToLocalStorage();
             loadVendos();
             
             // Reset form
@@ -996,6 +977,7 @@
         function deleteVendo(id) {
             if (confirm('Are you sure you want to delete this vendo?')) {
                 appState.vendos = appState.vendos.filter(v => v.id !== id);
+                saveToLocalStorage();
                 loadVendos();
             }
         }
@@ -1104,6 +1086,7 @@
             };
             
             appState.transactions.push(newTransaction);
+            saveToLocalStorage();
             
             // Update dashboard if admin
             if (appState.currentUser.role === 'admin') {
@@ -1120,6 +1103,16 @@
             }
             appState.signatureData = null;
             document.getElementById('preview-signature').src = '';
+        }
+
+        // Delete a transaction
+        function deleteTransaction(id) {
+            if (confirm('Are you sure you want to delete this transaction?')) {
+                appState.transactions = appState.transactions.filter(t => t.id !== id);
+                saveToLocalStorage();
+                updateDashboard();
+                generateReport();
+            }
         }
 
         // Save receipt as image
@@ -1203,6 +1196,11 @@
                     <td>${vendo ? vendo.name : 'Unknown'}</td>
                     <td>₱${trans.grossSales.toFixed(2)}</td>
                     <td>₱${netIncome.toFixed(2)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-danger" onclick="deleteTransaction(${trans.id})">Delete</button>
+                        </div>
+                    </td>
                 `;
                 recentTransactions.appendChild(row);
             });
@@ -1302,6 +1300,11 @@
                     <td>₱${trans.grossSales.toFixed(2)}</td>
                     <td>₱${expenses.toFixed(2)}</td>
                     <td>₱${netIncome.toFixed(2)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-danger" onclick="deleteTransaction(${trans.id})">Delete</button>
+                        </div>
+                    </td>
                 `;
                 reportData.appendChild(row);
             });
@@ -1384,7 +1387,9 @@
                     <td>${user.username}</td>
                     <td>${user.role}</td>
                     <td>
-                        <button class="btn btn-sm btn-danger" onclick="deleteUser('${user.username}')">Delete</button>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-danger" onclick="deleteUser('${user.username}')">Delete</button>
+                        </div>
                     </td>
                 `;
                 userList.appendChild(row);
@@ -1417,6 +1422,7 @@
             };
             
             appState.users.push(newUser);
+            saveToLocalStorage();
             loadUsers();
             
             // Reset form
@@ -1429,6 +1435,7 @@
         function deleteUser(username) {
             if (confirm('Are you sure you want to delete this user?')) {
                 appState.users = appState.users.filter(u => u.username !== username);
+                saveToLocalStorage();
                 loadUsers();
             }
         }
