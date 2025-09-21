@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXE WIFI VENDO Management System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-bottom: 70px; /* Space for bottom navbar */
+        }
+        
+        /* Mobile-first responsive adjustments */
+        .container-fluid {
+            padding: 10px;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            border: none;
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 12px 15px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+        
+        /* Bottom navigation for mobile */
+        .bottom-navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+        }
+        
+        .nav-item {
+            text-align: center;
+            padding: 5px;
+            cursor: pointer;
+        }
+        
+        .nav-item i {
+            font-size: 1.2rem;
+            display: block;
+            margin: 0 auto 5px;
+        }
+        
+        .nav-item span {
+            font-size: 0.7rem;
+        }
+        
+        .nav-item.active {
+            color: var(--secondary-color);
+        }
+        
+        /* Login screen adjustments */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+        }
+        
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+        
+        /* Form adjustments for mobile */
+        .form-control, .form-select {
+            padding: 10px;
+            font-size: 16px; /* Prevents zoom on iOS */
+        }
+        
+        /* Receipt styling */
+        .receipt-container {
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            width: 100%;
+            margin: 0 auto;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            font-size: 0.9rem;
+        }
+        
+        /* Table adjustments */
+        .table-responsive {
+            font-size: 0.8rem;
+        }
+        
+        /* Dashboard cards */
+        .dashboard-card {
+            margin-bottom: 15px;
+        }
+        
+        .dashboard-card .card-body {
+            padding: 15px;
+        }
+        
+        /* Hidden elements */
+        .hidden {
+            display: none;
+        }
+        
+        /* Section management */
+        .app-section {
+            display: none;
+        }
+        
+        .app-section.active {
+            display: block;
+        }
+        
+        /* Icon sizes */
+        .fa-3x {
+            font-size: 2.5em;
+        }
+        
+        /* Signature Canvas */
+        #signature-canvas {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            touch-action: none;
+            width: 100%;
+            height: 150px;
+        }
+        
+        .signature-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        
+        /* Adjustments for larger screens */
+        @media (min-width: 768px) {
+            .bottom-navbar {
+                display: none;
+            }
+            
+            .top-navbar {
+                display: block !important;
+            }
+            
+            body {
+                padding-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Section -->
+    <div id="login-section" class="login-container">
+        <div class="card login-card">
+            <div class="card-body">
+                <h3 class="text-center mb-4">EXE WIFI VENDO</h3>
+                <div class="text-center mb-4">
+                    <i class="fas fa-wifi fa-3x text-primary"></i>
+                </div>
+                <form id="login-form">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="main-app" class="hidden">
+        <!-- Top Navigation Bar (for larger screens) -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark top-navbar">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-wifi me-2"></i>EXE WIFI VENDO
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item" id="dashboard-nav-item">
+                            <a class="nav-link active" href="#" data-section="dashboard-section">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="vendo-management-section">Vendo Management</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="receipt-section">Generate Receipt</a>
+                        </li>
+                        <li class="nav-item" id="reports-nav-item">
+                            <a class="nav-link" href="#" data-section="reports-section">Reports</a>
+                        </li>
+                        <li class="nav-item" id="users-nav-item">
+                            <a class="nav-link" href="#" data-section="user-management-section">User Management</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex">
+                        <span class="navbar-text me-3" id="user-info"></span>
+                        <button class="btn btn-outline-light btn-sm" id="logout-btn">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container-fluid mt-2">
+            <!-- Dashboard Section (Admin Only) -->
+            <div id="dashboard-section" class="app-section active">
+                <div class="row">
+                    <div class="col-6 col-md-3">
+                        <div class="card dashboard-card text-center">
+                            <div class="card-body">
+                                <i class="fas fa-money-bill-wave fa-3x text-success mb-2"></i>
+                                <h6>Monthly Income</h6>
+                                <h5 id="monthly-income">₱0.00</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card dashboard-card text-center">
+                            <div class="card-body">
+                                <i class="fas fa-bolt fa-3x text-warning mb-2"></i>
+                                <h6>Electricity</h6>
+                                <h5 id="electricity-expenses">₱0.00</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card dashboard-card text-center">
+                            <div class="card-body">
+                                <i class="fas fa-globe fa-3x text-info mb-2"></i>
+                                <h6>Internet</h6>
+                                <h5 id="internet-expenses">₱0.00</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card dashboard-card text-center">
+                            <div class="card-body">
+                                <i class="fas fa-chart-line fa-3x text-primary mb-2"></i>
+                                <h6>Net Income</h6>
+                                <h5 id="net-income">₱0.00</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Recent Transactions</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Vendo</th>
+                                                <th>Gross Sales</th>
+                                                <th>Net Income</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recent-transactions">
+                                            <!-- Transactions will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vendo Management Section -->
+            <div id="vendo-management-section" class="app-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Vendo Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="card">
+                                <div class="card-header bg-secondary text-white py-2">
+                                    <h6 class="mb-0">Add New Vendo</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form id="add-vendo-form">
+                                        <div class="mb-2">
+                                            <label for="vendo-name" class="form-label">Vendo Name</label>
+                                            <input type="text" class="form-control" id="vendo-name" required>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="vendo-address" class="form-label">Vendo Address</label>
+                                            <textarea class="form-control" id="vendo-address" rows="2" required></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-sm">Add Vendo</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header bg-secondary text-white py-2">
+                                <h6 class="mb-0">Existing Vendos</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm vendo-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Address</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="vendo-list">
+                                            <!-- Vendo list will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Receipt Generation Section -->
+            <div id="receipt-section" class="app-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Receipt Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="receipt-form">
+                            <div class="mb-2">
+                                <label for="harvest-date" class="form-label">Date of Harvest</label>
+                                <input type="date" class="form-control" id="harvest-date" required>
+                            </div>
+                            <div class="mb-2">
+                                <label for="vendo-select" class="form-label">Vendo Name</label>
+                                <select class="form-select" id="vendo-select" required>
+                                    <option value="">Select Vendo</option>
+                                    <!-- Vendo options will be populated here -->
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label for="gross-sales" class="form-label">Gross Sales (₱)</label>
+                                <input type="number" class="form-control" id="gross-sales" step="0.01" min="0" required>
+                            </div>
+                            <div class="mb-2">
+                                <label for="internet-payment" class="form-label">Internet Payment (₱)</label>
+                                <input type="number" class="form-control" id="internet-payment" step="0.01" min="0" required>
+                            </div>
+                            <div class="mb-2">
+                                <label for="electricity-usage" class="form-label">Electricity Usage (₱)</label>
+                                <input type="number" class="form-control" id="electricity-usage" step="0.01" min="0" required>
+                            </div>
+                            <div class="mb-2">
+                                <label for="custodian-name" class="form-label">Vendo Custodian Name</label>
+                                <input type="text" class="form-control" id="custodian-name" required>
+                            </div>
+                            
+                            <!-- Signature Canvas -->
+                            <div class="mb-2">
+                                <label class="form-label">Custodian Signature</label>
+                                <canvas id="signature-canvas"></canvas>
+                                <div class="signature-controls">
+                                    <button type="button" class="btn btn-secondary btn-sm" id="clear-signature">Clear</button>
+                                    <button type="button" class="btn btn-primary btn-sm" id="save-signature">Save Signature</button>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100">Generate Receipt</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">Receipt Preview</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="receipt-container" id="receipt-preview">
+                            <div class="receipt-header text-center">
+                                <h5>EXE WIFI VENDO</h5>
+                                <p class="mb-1">Official Receipt</p>
+                            </div>
+                            <div class="receipt-body">
+                                <p class="mb-1"><strong>Date of Harvest:</strong> <span id="preview-date">-</span></p>
+                                <p class="mb-1"><strong>Vendo Name:</strong> <span id="preview-vendo-name">-</span></p>
+                                <p class="mb-1"><strong>Vendo Address:</strong> <span id="preview-vendo-address">-</span></p>
+                                <hr class="my-2">
+                                <p class="mb-1"><strong>Gross Sales:</strong> ₱<span id="preview-gross-sales">0.00</span></p>
+                                <p class="mb-1"><strong>Less:</strong></p>
+                                <ul class="list-unstyled ms-3 mb-1">
+                                    <li>Internet Payment: ₱<span id="preview-internet">0.00</span></li>
+                                    <li>Electricity Usage: ₱<span id="preview-electricity">0.00</span></li>
+                                </ul>
+                                <p class="mb-1"><strong>Total Net Gross:</strong> ₱<span id="preview-net-gross">0.00</span></p>
+                                <hr class="my-2">
+                                <p class="mb-1"><strong>Less 20% for Vendo Custodian:</strong> ₱<span id="preview-custodian-share">0.00</span></p>
+                                <p class="mb-1"><strong>Total Net Income:</strong> ₱<span id="preview-net-income">0.00</span></p>
+                                <hr class="my-2">
+                                <p class="mb-1"><strong>Add Internet Payment + Net Income:</strong> ₱<span id="preview-net-gain">0.00</span></p>
+                                <div class="signature-line mt-3">
+                                    <p class="mb-0">Signature: </p>
+                                    <img id="preview-signature" src="" alt="Signature" style="max-width: 200px; max-height: 80px; display: block; margin: 5px 0;">
+                                    <p class="mb-0"><span id="preview-custodian">Vendo Custodian</span></p>
+                                </div>
+                            </div>
+                            <div class="receipt-footer text-center mt-2">
+                                <p class="mb-0">Thank you for your business!</p>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center mt-3">
+                            <button class="btn btn-success me-2" id="save-receipt-btn">
+                                <i class="fas fa-download me-1"></i> Save
+                            </button>
+                            <button class="btn btn-primary" id="print-receipt-btn">
+                                <i class="fas fa-print me-1"></i> Print
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Section (Admin Only) -->
+            <div id="reports-section" class="app-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Financial Reports</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-12 mb-2">
+                                <label for="report-type" class="form-label">Report Type</label>
+                                <select class="form-select" id="report-type">
+                                    <option value="monthly">Monthly Report</option>
+                                    <option value="yearly">Yearly Report</option>
+                                </select>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <label for="report-vendo" class="form-label">Vendo</label>
+                                <select class="form-select" id="report-vendo">
+                                    <option value="all">All Vendos</option>
+                                    <!-- Vendo options will be populated here -->
+                                </select>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <label for="report-period" class="form-label" id="report-period-label">Month</label>
+                                <select class="form-select" id="report-period">
+                                    <!-- Options will be populated based on report type -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Vendo</th>
+                                        <th>Gross Sales</th>
+                                        <th>Expenses</th>
+                                        <th>Net Income</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="report-data">
+                                    <!-- Report data will be populated here -->
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-primary">
+                                        <th colspan="2">TOTAL</th>
+                                        <th id="report-total-sales">₱0.00</th>
+                                        <th id="report-total-expenses">₱0.00</th>
+                                        <th id="report-total-income">₱0.00</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="text-center mt-2">
+                            <button class="btn btn-primary btn-sm" id="export-report-btn">
+                                <i class="fas fa-file-export me-1"></i> Export Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Management Section (Admin Only) -->
+            <div id="user-management-section" class="app-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">User Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="card">
+                                <div class="card-header bg-secondary text-white py-2">
+                                    <h6 class="mb-0">Add New User</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form id="add-user-form">
+                                        <div class="mb-2">
+                                            <label for="new-username" class="form-label">Username</label>
+                                            <input type="text" class="form-control" id="new-username" required>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="new-password" class="form-label">Password</label>
+                                            <input type="password" class="form-control" id="new-password" required>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="user-role" class="form-label">Role</label>
+                                            <select class="form-select" id="user-role" required>
+                                                <option value="collector">Collector</option>
+                                                <option value="admin">Admin</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-sm">Add User</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header bg-secondary text-white py-2">
+                                <h6 class="mb-0">Existing Users</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Username</th>
+                                                <th>Role</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="user-list">
+                                            <!-- User list will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation Bar (for mobile) -->
+        <div class="bottom-navbar">
+            <div class="nav-item active" data-section="dashboard-section" id="dashboard-nav-item-mobile">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item" data-section="vendo-management-section">
+                <i class="fas fa-wifi"></i>
+                <span>Vendos</span>
+            </div>
+            <div class="nav-item" data-section="receipt-section">
+                <i class="fas fa-receipt"></i>
+                <span>Receipt</span>
+            </div>
+            <div class="nav-item" data-section="reports-section" id="reports-nav-item-mobile">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </div>
+            <div class="nav-item" data-section="user-management-section" id="users-nav-item-mobile">
+                <i class="fas fa-users"></i>
+                <span>Users</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- html2canvas for saving receipt as image -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    
+    <script>
+        // Application data and state
+        const appState = {
+            currentUser: null,
+            currentSection: 'dashboard-section',
+            vendos: [],
+            transactions: [],
+            users: [
+                { username: 'admin', password: '2020Pagadian', role: 'admin' }
+            ],
+            signatureData: null
+        };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                appState.currentUser = JSON.parse(savedUser);
+                showMainApp();
+            }
+
+            // Set up event listeners
+            document.getElementById('login-form').addEventListener('submit', handleLogin);
+            
+            // Load sample data for demonstration
+            loadSampleData();
+        });
+
+        // Handle user login
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const user = appState.users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                appState.currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                showMainApp();
+            } else {
+                alert('Invalid username or password');
+            }
+        }
+
+        // Handle user logout
+        function handleLogout() {
+            appState.currentUser = null;
+            localStorage.removeItem('currentUser');
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('login-section').classList.remove('hidden');
+        }
+
+        // Show main application after login
+        function showMainApp() {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            
+            // Set up event listeners that need to be set after the app is shown
+            document.getElementById('logout-btn').addEventListener('click', handleLogout);
+            
+            // Navigation items for bottom navbar
+            const bottomNavItems = document.querySelectorAll('.bottom-navbar .nav-item');
+            bottomNavItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    showSection(this.getAttribute('data-section'));
+                    
+                    // Update active state
+                    bottomNavItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Navigation links for top navbar
+            const topNavLinks = document.querySelectorAll('.top-navbar .nav-link');
+            topNavLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.getAttribute('data-section');
+                    showSection(section);
+                    
+                    // Update active state for bottom nav
+                    bottomNavItems.forEach(item => {
+                        if (item.getAttribute('data-section') === section) {
+                            item.classList.add('active');
+                        } else {
+                            item.classList.remove('active');
+                        }
+                    });
+                });
+            });
+            
+            // Form submissions
+            document.getElementById('add-vendo-form').addEventListener('submit', handleAddVendo);
+            document.getElementById('receipt-form').addEventListener('submit', handleReceiptGeneration);
+            document.getElementById('add-user-form').addEventListener('submit', handleAddUser);
+            
+            // Buttons
+            document.getElementById('save-receipt-btn').addEventListener('click', saveReceiptAsImage);
+            document.getElementById('print-receipt-btn').addEventListener('click', printReceipt);
+            document.getElementById('export-report-btn').addEventListener('click', exportReport);
+            
+            // Report filters
+            document.getElementById('report-type').addEventListener('change', updateReportFilters);
+            document.getElementById('report-vendo').addEventListener('change', generateReport);
+            document.getElementById('report-period').addEventListener('change', generateReport);
+            
+            // Update receipt preview when form values change
+            const receiptInputs = document.querySelectorAll('#receipt-form input, #receipt-form select');
+            receiptInputs.forEach(input => {
+                input.addEventListener('input', updateReceiptPreview);
+            });
+            
+            // Show/hide sections based on user role
+            if (appState.currentUser.role !== 'admin') {
+                // Hide admin-only sections for collectors
+                document.getElementById('dashboard-nav-item').style.display = 'none';
+                document.getElementById('reports-nav-item').style.display = 'none';
+                document.getElementById('users-nav-item').style.display = 'none';
+                document.getElementById('dashboard-nav-item-mobile').style.display = 'none';
+                document.getElementById('reports-nav-item-mobile').style.display = 'none';
+                document.getElementById('users-nav-item-mobile').style.display = 'none';
+                
+                // Hide dashboard section for collectors
+                document.getElementById('dashboard-section').classList.remove('active');
+                
+                // Start with receipt section for collectors
+                showSection('receipt-section');
+                
+                // Update active nav item
+                bottomNavItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.getAttribute('data-section') === 'receipt-section') {
+                        item.classList.add('active');
+                    }
+                });
+            } else {
+                document.getElementById('dashboard-nav-item').style.display = 'block';
+                document.getElementById('reports-nav-item').style.display = 'block';
+                document.getElementById('users-nav-item').style.display = 'block';
+                document.getElementById('dashboard-nav-item-mobile').style.display = 'block';
+                document.getElementById('reports-nav-item-mobile').style.display = 'block';
+                document.getElementById('users-nav-item-mobile').style.display = 'block';
+                
+                // Start with dashboard section for admins
+                showSection('dashboard-section');
+            }
+            
+            // Update user info
+            document.getElementById('user-info').textContent = `Logged in as: ${appState.currentUser.username} (${appState.currentUser.role})`;
+            
+            // Load data for the current section
+            loadVendos();
+            loadUsers();
+            updateDashboard();
+            
+            // Initialize signature pad
+            initSignaturePad();
+        }
+
+        // Show the specified section
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.app-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show the requested section
+            const sectionElement = document.getElementById(sectionId);
+            if (sectionElement) {
+                sectionElement.classList.add('active');
+                appState.currentSection = sectionId;
+            } else {
+                console.error(`Section with ID ${sectionId} not found`);
+            }
+            
+            // Section-specific initialization
+            if (sectionId === 'receipt-section') {
+                populateVendoDropdown();
+                setDefaultDate();
+            } else if (sectionId === 'reports-section') {
+                updateReportFilters();
+            }
+        }
+
+        // Initialize signature pad
+        function initSignaturePad() {
+            const canvas = document.getElementById('signature-canvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
+            
+            // Set canvas size
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // Set line style
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = '#000';
+            
+            // Drawing functions
+            function startDrawing(e) {
+                isDrawing = true;
+                [lastX, lastY] = [e.offsetX, e.offsetY];
+            }
+            
+            function draw(e) {
+                if (!isDrawing) return;
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.stroke();
+                [lastX, lastY] = [e.offsetX, e.offsetY];
+            }
+            
+            function stopDrawing() {
+                isDrawing = false;
+            }
+            
+            // Mouse events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Touch events for mobile
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                const mouseEvent = new MouseEvent('mousedown', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                canvas.dispatchEvent(mouseEvent);
+            });
+            
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent('mousemove', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                canvas.dispatchEvent(mouseEvent);
+            });
+            
+            canvas.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                const mouseEvent = new MouseEvent('mouseup', {});
+                canvas.dispatchEvent(mouseEvent);
+            });
+            
+            // Clear signature button
+            document.getElementById('clear-signature').addEventListener('click', () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                appState.signatureData = null;
+                document.getElementById('preview-signature').src = '';
+            });
+            
+            // Save signature button
+            document.getElementById('save-signature').addEventListener('click', () => {
+                appState.signatureData = canvas.toDataURL();
+                document.getElementById('preview-signature').src = appState.signatureData;
+                alert('Signature saved successfully!');
+            });
+        }
+
+        // Load sample data for demonstration
+        function loadSampleData() {
+            // Sample vendos
+            appState.vendos = [
+                { id: 1, name: 'Vendo 1 - Main Street', address: '123 Main Street, Pagadian City' },
+                { id: 2, name: 'Vendo 2 - Market Square', address: 'Market Square, Pagadian City' },
+                { id: 3, name: 'Vendo 3 - Mall Branch', address: 'Gaisano Mall, Pagadian City' }
+            ];
+            
+            // Sample transactions
+            const today = new Date();
+            const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 15);
+            const twoMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 2, 10);
+            
+            appState.transactions = [
+                {
+                    id: 1,
+                    date: today,
+                    vendoId: 1,
+                    grossSales: 12500,
+                    internetPayment: 1500,
+                    electricityUsage: 800,
+                    custodianName: 'Juan Dela Cruz',
+                    signature: null
+                },
+                {
+                    id: 2,
+                    date: lastMonth,
+                    vendoId: 2,
+                    grossSales: 9800,
+                    internetPayment: 1500,
+                    electricityUsage: 750,
+                    custodianName: 'Maria Santos',
+                    signature: null
+                },
+                {
+                    id: 3,
+                    date: twoMonthsAgo,
+                    vendoId: 3,
+                    grossSales: 11200,
+                    internetPayment: 1500,
+                    electricityUsage: 820,
+                    custodianName: 'Pedro Reyes',
+                    signature: null
+                }
+            ];
+            
+            // Sample users (besides the default admin)
+            appState.users.push(
+                { username: 'collector1', password: 'password1', role: 'collector' },
+                { username: 'collector2', password: 'password2', role: 'collector' }
+            );
+        }
+
+        // Load vendos into the UI
+        function loadVendos() {
+            const vendoList = document.getElementById('vendo-list');
+            if (!vendoList) return;
+            
+            vendoList.innerHTML = '';
+            
+            appState.vendos.forEach(vendo => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${vendo.name}</td>
+                    <td>${vendo.address}</td>
+                    <td>
+                        ${appState.currentUser.role === 'admin' ? 
+                        `<button class="btn btn-sm btn-danger" onclick="deleteVendo(${vendo.id})">Delete</button>` : 
+                        ''}
+                    </td>
+                `;
+                vendoList.appendChild(row);
+            });
+        }
+
+        // Handle adding a new vendo
+        function handleAddVendo(e) {
+            e.preventDefault();
+            
+            if (appState.currentUser.role !== 'admin') {
+                alert('Only administrators can add new vendos.');
+                return;
+            }
+            
+            const name = document.getElementById('vendo-name').value;
+            const address = document.getElementById('vendo-address').value;
+            
+            const newVendo = {
+                id: appState.vendos.length > 0 ? Math.max(...appState.vendos.map(v => v.id)) + 1 : 1,
+                name: name,
+                address: address
+            };
+            
+            appState.vendos.push(newVendo);
+            loadVendos();
+            
+            // Reset form
+            document.getElementById('add-vendo-form').reset();
+            
+            alert('Vendo added successfully!');
+        }
+
+        // Delete a vendo
+        function deleteVendo(id) {
+            if (confirm('Are you sure you want to delete this vendo?')) {
+                appState.vendos = appState.vendos.filter(v => v.id !== id);
+                loadVendos();
+            }
+        }
+
+        // Populate vendo dropdown in receipt form
+        function populateVendoDropdown() {
+            const vendoSelect = document.getElementById('vendo-select');
+            const reportVendo = document.getElementById('report-vendo');
+            
+            if (!vendoSelect || !reportVendo) return;
+            
+            // Clear existing options except the first one
+            while (vendoSelect.options.length > 1) {
+                vendoSelect.remove(1);
+            }
+            while (reportVendo.options.length > 1) {
+                reportVendo.remove(1);
+            }
+            
+            // Add vendo options
+            appState.vendos.forEach(vendo => {
+                const option = document.createElement('option');
+                option.value = vendo.id;
+                option.textContent = vendo.name;
+                vendoSelect.appendChild(option.cloneNode(true));
+                reportVendo.appendChild(option);
+            });
+        }
+
+        // Set default date to today
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('harvest-date').value = today;
+            updateReceiptPreview();
+        }
+
+        // Update receipt preview based on form values
+        function updateReceiptPreview() {
+            const date = document.getElementById('harvest-date').value;
+            const vendoId = document.getElementById('vendo-select').value;
+            const grossSales = parseFloat(document.getElementById('gross-sales').value) || 0;
+            const internetPayment = parseFloat(document.getElementById('internet-payment').value) || 0;
+            const electricityUsage = parseFloat(document.getElementById('electricity-usage').value) || 0;
+            const custodianName = document.getElementById('custodian-name').value;
+            
+            // Find selected vendo
+            const vendo = appState.vendos.find(v => v.id === parseInt(vendoId));
+            
+            // Calculate values
+            const netGross = grossSales - internetPayment - electricityUsage;
+            const custodianShare = netGross * 0.2;
+            const netIncome = netGross - custodianShare;
+            const netGain = netIncome + internetPayment;
+            
+            // Update preview
+            document.getElementById('preview-date').textContent = date ? new Date(date).toLocaleDateString() : '-';
+            document.getElementById('preview-vendo-name').textContent = vendo ? vendo.name : '-';
+            document.getElementById('preview-vendo-address').textContent = vendo ? vendo.address : '-';
+            document.getElementById('preview-gross-sales').textContent = grossSales.toFixed(2);
+            document.getElementById('preview-internet').textContent = internetPayment.toFixed(2);
+            document.getElementById('preview-electricity').textContent = electricityUsage.toFixed(2);
+            document.getElementById('preview-net-gross').textContent = netGross.toFixed(2);
+            document.getElementById('preview-custodian-share').textContent = custodianShare.toFixed(2);
+            document.getElementById('preview-net-income').textContent = netIncome.toFixed(2);
+            document.getElementById('preview-net-gain').textContent = netGain.toFixed(2);
+            document.getElementById('preview-custodian').textContent = custodianName || 'Vendo Custodian';
+            
+            // Update signature if available
+            if (appState.signatureData) {
+                document.getElementById('preview-signature').src = appState.signatureData;
+            }
+        }
+
+        // Handle receipt generation
+        function handleReceiptGeneration(e) {
+            e.preventDefault();
+            
+            const date = document.getElementById('harvest-date').value;
+            const vendoId = document.getElementById('vendo-select').value;
+            const grossSales = parseFloat(document.getElementById('gross-sales').value);
+            const internetPayment = parseFloat(document.getElementById('internet-payment').value);
+            const electricityUsage = parseFloat(document.getElementById('electricity-usage').value);
+            const custodianName = document.getElementById('custodian-name').value;
+            
+            // Validate inputs
+            if (!vendoId) {
+                alert('Please select a vendo.');
+                return;
+            }
+            
+            if (!appState.signatureData) {
+                alert('Please provide a signature.');
+                return;
+            }
+            
+            // Create transaction record
+            const newTransaction = {
+                id: appState.transactions.length > 0 ? Math.max(...appState.transactions.map(t => t.id)) + 1 : 1,
+                date: new Date(date),
+                vendoId: parseInt(vendoId),
+                grossSales: grossSales,
+                internetPayment: internetPayment,
+                electricityUsage: electricityUsage,
+                custodianName: custodianName,
+                signature: appState.signatureData
+            };
+            
+            appState.transactions.push(newTransaction);
+            
+            // Update dashboard if admin
+            if (appState.currentUser.role === 'admin') {
+                updateDashboard();
+            }
+            
+            alert('Receipt generated successfully! Transaction has been recorded.');
+            
+            // Reset signature
+            const canvas = document.getElementById('signature-canvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            appState.signatureData = null;
+            document.getElementById('preview-signature').src = '';
+        }
+
+        // Save receipt as image
+        function saveReceiptAsImage() {
+            html2canvas(document.getElementById('receipt-preview')).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'exe-wifi-receipt.jpg';
+                link.href = canvas.toDataURL('image/jpeg');
+                link.click();
+            });
+        }
+
+        // Print receipt
+        function printReceipt() {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>EXE WIFI VENDO Receipt</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; font-size: 14px; }
+                            .receipt-container { width: 300px; margin: 0 auto; }
+                            .receipt-header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 15px; }
+                            .receipt-footer { border-top: 2px dashed #000; padding-top: 15px; margin-top: 15px; text-align: center; }
+                            .signature-line { margin-top: 60px; padding-top: 5px; }
+                            .signature-line img { max-width: 200px; max-height: 80px; display: block; margin: 5px 0; }
+                        </style>
+                    </head>
+                    <body>
+                        ${document.getElementById('receipt-preview').outerHTML}
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // Update dashboard with current data
+        function updateDashboard() {
+            // Calculate current month totals
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            
+            const monthTransactions = appState.transactions.filter(t => {
+                const transDate = new Date(t.date);
+                return transDate.getMonth() === currentMonth && transDate.getFullYear() === currentYear;
+            });
+            
+            const totalSales = monthTransactions.reduce((sum, t) => sum + t.grossSales, 0);
+            const totalInternet = monthTransactions.reduce((sum, t) => sum + t.internetPayment, 0);
+            const totalElectricity = monthTransactions.reduce((sum, t) => sum + t.electricityUsage, 0);
+            const totalNetGross = totalSales - totalInternet - totalElectricity;
+            const totalNetIncome = totalNetGross * 0.8;
+            
+            // Update dashboard values
+            document.getElementById('monthly-income').textContent = `₱${totalSales.toFixed(2)}`;
+            document.getElementById('electricity-expenses').textContent = `₱${totalElectricity.toFixed(2)}`;
+            document.getElementById('internet-expenses').textContent = `₱${totalInternet.toFixed(2)}`;
+            document.getElementById('net-income').textContent = `₱${totalNetIncome.toFixed(2)}`;
+            
+            // Update recent transactions
+            const recentTransactions = document.getElementById('recent-transactions');
+            if (!recentTransactions) return;
+            
+            recentTransactions.innerHTML = '';
+            
+            // Show last 5 transactions
+            const recent = [...appState.transactions]
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 5);
+            
+            recent.forEach(trans => {
+                const vendo = appState.vendos.find(v => v.id === trans.vendoId);
+                const netGross = trans.grossSales - trans.internetPayment - trans.electricityUsage;
+                const netIncome = netGross * 0.8;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(trans.date).toLocaleDateString()}</td>
+                    <td>${vendo ? vendo.name : 'Unknown'}</td>
+                    <td>₱${trans.grossSales.toFixed(2)}</td>
+                    <td>₱${netIncome.toFixed(2)}</td>
+                `;
+                recentTransactions.appendChild(row);
+            });
+        }
+
+        // Update report filters based on selected report type
+        function updateReportFilters() {
+            const reportType = document.getElementById('report-type').value;
+            const periodLabel = document.getElementById('report-period-label');
+            const periodSelect = document.getElementById('report-period');
+            
+            if (!periodLabel || !periodSelect) return;
+            
+            // Clear existing options
+            periodSelect.innerHTML = '';
+            
+            if (reportType === 'monthly') {
+                periodLabel.textContent = 'Month';
+                
+                // Add months for the past 12 months
+                const now = new Date();
+                for (let i = 0; i < 12; i++) {
+                    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                    const option = document.createElement('option');
+                    option.value = `${date.getFullYear()}-${date.getMonth() + 1}`;
+                    option.textContent = `${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}`;
+                    periodSelect.appendChild(option);
+                }
+            } else {
+                periodLabel.textContent = 'Year';
+                
+                // Add years for the past 5 years
+                const currentYear = new Date().getFullYear();
+                for (let year = currentYear; year > currentYear - 5; year--) {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    periodSelect.appendChild(option);
+                }
+            }
+            
+            // Generate report with new filters
+            generateReport();
+        }
+
+        // Generate report based on selected filters
+        function generateReport() {
+            const reportType = document.getElementById('report-type').value;
+            const vendoId = document.getElementById('report-vendo').value;
+            const period = document.getElementById('report-period').value;
+            
+            let filteredTransactions = [...appState.transactions];
+            
+            // Filter by vendo
+            if (vendoId !== 'all') {
+                filteredTransactions = filteredTransactions.filter(t => t.vendoId === parseInt(vendoId));
+            }
+            
+            // Filter by period
+            if (reportType === 'monthly') {
+                const [year, month] = period.split('-').map(Number);
+                filteredTransactions = filteredTransactions.filter(t => {
+                    const transDate = new Date(t.date);
+                    return transDate.getFullYear() === year && transDate.getMonth() + 1 === month;
+                });
+            } else {
+                filteredTransactions = filteredTransactions.filter(t => {
+                    const transDate = new Date(t.date);
+                    return transDate.getFullYear() === parseInt(period);
+                });
+            }
+            
+            // Display report data
+            const reportData = document.getElementById('report-data');
+            if (!reportData) return;
+            
+            reportData.innerHTML = '';
+            
+            let totalSales = 0;
+            let totalExpenses = 0;
+            let totalIncome = 0;
+            
+            filteredTransactions.forEach(trans => {
+                const vendo = appState.vendos.find(v => v.id === trans.vendoId);
+                const expenses = trans.internetPayment + trans.electricityUsage;
+                const netGross = trans.grossSales - expenses;
+                const netIncome = netGross * 0.8;
+                
+                totalSales += trans.grossSales;
+                totalExpenses += expenses;
+                totalIncome += netIncome;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(trans.date).toLocaleDateString()}</td>
+                    <td>${vendo ? vendo.name : 'Unknown'}</td>
+                    <td>₱${trans.grossSales.toFixed(2)}</td>
+                    <td>₱${expenses.toFixed(2)}</td>
+                    <td>₱${netIncome.toFixed(2)}</td>
+                `;
+                reportData.appendChild(row);
+            });
+            
+            // Update totals
+            document.getElementById('report-total-sales').textContent = `₱${totalSales.toFixed(2)}`;
+            document.getElementById('report-total-expenses').textContent = `₱${totalExpenses.toFixed(2)}`;
+            document.getElementById('report-total-income').textContent = `₱${totalIncome.toFixed(2)}`;
+        }
+
+        // Export report as CSV
+        function exportReport() {
+            const reportType = document.getElementById('report-type').value;
+            const vendoId = document.getElementById('report-vendo').value;
+            const period = document.getElementById('report-period').value;
+            
+            let vendoName = 'All Vendos';
+            if (vendoId !== 'all') {
+                const vendo = appState.vendos.find(v => v.id === parseInt(vendoId));
+                vendoName = vendo ? vendo.name : 'Unknown';
+            }
+            
+            let periodText = '';
+            if (reportType === 'monthly') {
+                const [year, month] = period.split('-').map(Number);
+                periodText = `${new Date(year, month - 1).toLocaleString('default', { month: 'long' })} ${year}`;
+            } else {
+                periodText = period;
+            }
+            
+            // Create CSV content
+            let csv = `EXE WIFI VENDO ${reportType === 'monthly' ? 'Monthly' : 'Yearly'} Report\n`;
+            csv += `Vendo: ${vendoName}\n`;
+            csv += `Period: ${periodText}\n\n`;
+            csv += 'Date,Vendo Name,Gross Sales,Expenses,Net Income\n';
+            
+            const rows = document.querySelectorAll('#report-data tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 5) {
+                    const date = cells[0].textContent;
+                    const vendo = cells[1].textContent;
+                    const sales = cells[2].textContent.replace('₱', '');
+                    const expenses = cells[3].textContent.replace('₱', '');
+                    const income = cells[4].textContent.replace('₱', '');
+                    
+                    csv += `"${date}","${vendo}",${sales},${expenses},${income}\n`;
+                }
+            });
+            
+            // Add totals
+            const totalSales = document.getElementById('report-total-sales').textContent.replace('₱', '');
+            const totalExpenses = document.getElementById('report-total-expenses').textContent.replace('₱', '');
+            const totalIncome = document.getElementById('report-total-income').textContent.replace('₱', '');
+            
+            csv += `"TOTAL","",${totalSales},${totalExpenses},${totalIncome}\n`;
+            
+            // Create download link
+            const link = document.createElement('a');
+            link.download = `exe-wifi-report-${periodText.toLowerCase().replace(' ', '-')}.csv`;
+            link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+            link.click();
+        }
+
+        // Load users into the UI
+        function loadUsers() {
+            if (appState.currentUser.role !== 'admin') return;
+            
+            const userList = document.getElementById('user-list');
+            if (!userList) return;
+            
+            userList.innerHTML = '';
+            
+            appState.users.forEach(user => {
+                // Don't show the current user in the list for deletion
+                if (user.username === appState.currentUser.username) return;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.role}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="deleteUser('${user.username}')">Delete</button>
+                    </td>
+                `;
+                userList.appendChild(row);
+            });
+        }
+
+        // Handle adding a new user
+        function handleAddUser(e) {
+            e.preventDefault();
+            
+            if (appState.currentUser.role !== 'admin') {
+                alert('Only administrators can add new users.');
+                return;
+            }
+            
+            const username = document.getElementById('new-username').value;
+            const password = document.getElementById('new-password').value;
+            const role = document.getElementById('user-role').value;
+            
+            // Check if username already exists
+            if (appState.users.some(u => u.username === username)) {
+                alert('Username already exists. Please choose a different username.');
+                return;
+            }
+            
+            const newUser = {
+                username: username,
+                password: password,
+                role: role
+            };
+            
+            appState.users.push(newUser);
+            loadUsers();
+            
+            // Reset form
+            document.getElementById('add-user-form').reset();
+            
+            alert('User added successfully!');
+        }
+
+        // Delete a user
+        function deleteUser(username) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                appState.users = appState.users.filter(u => u.username !== username);
+                loadUsers();
+            }
+        }
+    </script>
+</body>
+</html>
